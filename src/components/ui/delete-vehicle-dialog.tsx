@@ -1,73 +1,57 @@
 "use client";
 
+import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { deleteVehicle } from "@/actions/vehicle-actions";
 import { Button } from "@/components/ui/button";
 
 import {
- AlertDialog,
- AlertDialogAction,
- AlertDialogCancel,
- AlertDialogContent,
- AlertDialogDescription,
- AlertDialogFooter,
- AlertDialogHeader,
- AlertDialogTitle,
- AlertDialogTrigger
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-export function DeleteVehicleDialog({
- vehicleId,
-}:{
- vehicleId:string
-}) {
+export function DeleteVehicleDialog({ vehicleId }: { vehicleId: string }) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
- const deleteAction = deleteVehicle.bind(
-   null,
-   vehicleId
- );
+  function handleDelete() {
+    startTransition(async () => {
+      await deleteVehicle(vehicleId);
+      router.refresh();
+    });
+  }
 
- return (
-  <AlertDialog>
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="destructive" size="sm">
+          Eliminar
+        </Button>
+      </AlertDialogTrigger>
 
-   <AlertDialogTrigger asChild>
-     <Button
-      variant="destructive"
-      size="sm"
-     >
-      Eliminar
-     </Button>
-   </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>¿Eliminar vehículo?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Esta acción no se puede deshacer.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
 
-   <AlertDialogContent>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
 
-    <AlertDialogHeader>
-      <AlertDialogTitle>
-        ¿Eliminar vehículo?
-      </AlertDialogTitle>
-
-      <AlertDialogDescription>
-        Esta acción no se puede deshacer.
-      </AlertDialogDescription>
-    </AlertDialogHeader>
-
-    <AlertDialogFooter>
-
-      <AlertDialogCancel>
-        Cancelar
-      </AlertDialogCancel>
-
-      <form action={deleteAction}>
-        <AlertDialogAction asChild>
-          <button type="submit">
-            Sí, eliminar
-          </button>
-        </AlertDialogAction>
-      </form>
-
-    </AlertDialogFooter>
-
-   </AlertDialogContent>
-
-  </AlertDialog>
- )
+          <AlertDialogAction onClick={handleDelete} disabled={isPending}>
+            {isPending ? "Eliminando..." : "Sí, eliminar"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
 }

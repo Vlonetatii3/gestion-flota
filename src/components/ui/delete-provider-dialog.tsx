@@ -1,5 +1,7 @@
 "use client";
 
+import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { deleteProvider } from "@/actions/provider-actions";
 import { Button } from "@/components/ui/button";
 
@@ -15,12 +17,16 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-export function DeleteProviderDialog({
-  providerId,
-}: {
-  providerId: string;
-}) {
-  const deleteAction = deleteProvider.bind(null, providerId);
+export function DeleteProviderDialog({ providerId }: { providerId: string }) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
+  function handleDelete() {
+    startTransition(async () => {
+      await deleteProvider(providerId);
+      router.refresh();
+    });
+  }
 
   return (
     <AlertDialog>
@@ -34,19 +40,16 @@ export function DeleteProviderDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>¿Eliminar proveedor?</AlertDialogTitle>
           <AlertDialogDescription>
-            Esta acción no se puede deshacer. Los mantenimientos asociados
-            quedarán sin proveedor.
+            Esta acción no se puede deshacer.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter>
           <AlertDialogCancel>Cancelar</AlertDialogCancel>
 
-          <form action={deleteAction}>
-            <AlertDialogAction asChild>
-              <button type="submit">Sí, eliminar</button>
-            </AlertDialogAction>
-          </form>
+          <AlertDialogAction onClick={handleDelete} disabled={isPending}>
+            {isPending ? "Eliminando..." : "Sí, eliminar"}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

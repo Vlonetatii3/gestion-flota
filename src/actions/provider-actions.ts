@@ -36,10 +36,10 @@ export async function updateProvider(
  redirect("/providers");
 }
 
-export async function deleteProvider(id:string){
- await prisma.provider.delete({
-   where:{id}
- });
+export async function deleteProvider(id: string) {
+  await prisma.provider.delete({
+    where: { id },
+  });
 
- revalidatePath("/providers");
+  revalidatePath("/providers");
 }
