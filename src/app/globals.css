@@ -1,26 +1,184 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --radius: 1rem;
+
+  --background: oklch(0.985 0.003 247);
+  --foreground: oklch(0.18 0.03 255);
+
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.03 255);
+
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.03 255);
+
+  --primary: oklch(0.56 0.19 260);
+  --primary-foreground: oklch(0.98 0.01 260);
+
+  --secondary: oklch(0.94 0.02 255);
+  --secondary-foreground: oklch(0.24 0.04 255);
+
+  --muted: oklch(0.94 0.015 250);
+  --muted-foreground: oklch(0.48 0.035 255);
+
+  --accent: oklch(0.92 0.04 260);
+  --accent-foreground: oklch(0.25 0.08 260);
+
+  --destructive: oklch(0.58 0.22 25);
+
+  --border: oklch(0.9 0.02 255);
+  --input: oklch(0.9 0.02 255);
+  --ring: oklch(0.56 0.19 260);
+}
+
+.dark {
+  --background: oklch(0.16 0.025 255);
+  --foreground: oklch(0.97 0.01 255);
+
+  --card: oklch(0.21 0.03 255);
+  --card-foreground: oklch(0.97 0.01 255);
+
+  --popover: oklch(0.21 0.03 255);
+  --popover-foreground: oklch(0.97 0.01 255);
+
+  --primary: oklch(0.68 0.18 260);
+  --primary-foreground: oklch(0.12 0.02 260);
+
+  --secondary: oklch(0.28 0.035 255);
+  --secondary-foreground: oklch(0.97 0.01 255);
+
+  --muted: oklch(0.28 0.03 255);
+  --muted-foreground: oklch(0.74 0.025 255);
+
+  --accent: oklch(0.3 0.07 260);
+  --accent-foreground: oklch(0.97 0.01 255);
+
+  --destructive: oklch(0.68 0.22 25);
+
+  --border: oklch(0.32 0.035 255);
+  --input: oklch(0.32 0.035 255);
+  --ring: oklch(0.68 0.18 260);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  main {
+    @apply min-h-screen;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply tracking-tight;
+  }
+
+  input,
+  select,
+  textarea {
+    @apply bg-background;
   }
 }
 
-body {
+.app-card {
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: var(--card);
+  padding: 1.25rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.app-card:hover {
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+}
+
+.app-kpi {
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: var(--card);
+  padding: 1.25rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.app-kpi-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+
+.app-kpi-value {
+  margin-top: 0.5rem;
+  font-size: 2rem;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.app-section {
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: var(--card);
+  padding: 1.25rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.app-input {
+  height: 40px;
+  width: 100%;
+  padding: 0 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.app-input:focus {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 25%, transparent);
+}
+
+.app-table {
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  background: var(--card);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
