@@ -3,37 +3,36 @@
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 
-export async function createMaintenance(
- formData:FormData
-){
+export async function createMaintenance(formData: FormData) {
+  const vehicleId = String(formData.get("vehicleId") || "");
+  const providerId = String(formData.get("providerId") || "");
+  const title = String(formData.get("title") || "");
+  const performedAt = String(formData.get("performedAt") || "");
+  const nextDueDate = String(formData.get("nextDueDate") || "");
+  const cost = String(formData.get("cost") || "");
 
- await prisma.maintenance.create({
-   data:{
-     vehicleId:String(
-       formData.get("vehicleId")
-     ),
+  if (!vehicleId) {
+    throw new Error("Debe seleccionar un vehículo.");
+  }
 
-     providerId:String(
-       formData.get("providerId")
-     ),
+  if (!title) {
+    throw new Error("Debe ingresar un título.");
+  }
 
-     title:String(
-       formData.get("title")
-     ),
+  if (!performedAt) {
+    throw new Error("Debe ingresar la fecha realizada.");
+  }
 
-     performedAt:new Date(
-       String(formData.get("performedAt"))
-     ),
+  await prisma.maintenance.create({
+    data: {
+      vehicleId,
+      providerId: providerId ? providerId : null,
+      title,
+      performedAt: new Date(performedAt),
+      nextDueDate: nextDueDate ? new Date(nextDueDate) : null,
+      cost: cost ? Number(cost) : null,
+    },
+  });
 
-     cost:formData.get("cost")
-      ? Number(formData.get("cost"))
-      : null,
-
-     nextDueDate:new Date(
-       String(formData.get("nextDueDate"))
-     )
-   }
- });
-
- redirect("/maintenances");
+  redirect("/maintenances");
 }
