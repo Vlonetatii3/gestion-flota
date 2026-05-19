@@ -18,6 +18,11 @@ enum MaintenanceStatus {
   OVERDUE
 }
 
+enum MaintenanceCategory {
+  PREVENTIVE
+  CORRECTIVE
+}
+
 model Vehicle {
   id              String          @id @default(uuid())
   code            String          @unique
@@ -50,13 +55,13 @@ model Provider {
 }
 
 model Maintenance {
-  id                    String      @id @default(uuid())
+  id                    String              @id @default(uuid())
   vehicleId             String
   providerId            String?
   title                 String
   description           String?
   performedAt           DateTime
-  cost                  Decimal?    @db.Decimal(10, 2)
+  cost                  Decimal?            @db.Decimal(10, 2)
 
   currentMileage        Int?
   currentEngineHours    Int?
@@ -65,14 +70,17 @@ model Maintenance {
   nextDueMileage        Int?
   nextDueEngineHours    Int?
 
-  notifyDaysBefore      Int         @default(15)
+  isDone                Boolean             @default(false)
+  category              MaintenanceCategory @default(PREVENTIVE)
+
+  notifyDaysBefore      Int                 @default(15)
   notifiedAt            DateTime?
 
-  createdAt             DateTime    @default(now())
-  updatedAt             DateTime    @updatedAt
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
 
-  vehicle               Vehicle     @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
-  provider              Provider?   @relation(fields: [providerId], references: [id], onDelete: SetNull)
+  vehicle               Vehicle             @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  provider              Provider?           @relation(fields: [providerId], references: [id], onDelete: SetNull)
 
   @@index([vehicleId])
   @@index([providerId])

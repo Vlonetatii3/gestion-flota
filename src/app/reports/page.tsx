@@ -34,38 +34,21 @@ export default async function ReportsPage({ searchParams }: Props) {
             ],
           }
         : undefined,
-
       provider: provider
-        ? {
-            name: {
-              contains: provider,
-              mode: "insensitive",
-            },
-          }
+        ? { name: { contains: provider, mode: "insensitive" } }
         : undefined,
-
       performedAt: getMonthRange(performedMonth),
       nextDueDate: getMonthRange(dueMonth),
     },
-    include: {
-      vehicle: true,
-      provider: true,
-    },
-    orderBy: {
-      performedAt: "desc",
-    },
+    include: { vehicle: true, provider: true },
+    orderBy: { performedAt: "desc" },
     take: 25,
   });
-
-  const totalCost = maintenances.reduce(
-    (acc, item) => acc + Number(item.cost || 0),
-    0
-  );
 
   return (
     <main className="p-8 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Reportes</h1>
+        <h1 className="text-2xl font-semibold">Reportes</h1>
         <p className="text-muted-foreground">
           Armá un reporte, previsualizalo y exportalo a Excel o PDF.
         </p>
@@ -84,13 +67,9 @@ export default async function ReportsPage({ searchParams }: Props) {
               placeholder="Ej: ABC123 o VH-001"
               className="app-input"
             />
-
             <datalist id="vehicles-list">
               {vehicles.map((v) => (
-                <option
-                  key={v.id}
-                  value={v.plate || v.code}
-                >
+                <option key={v.id} value={v.plate || v.code}>
                   {v.code}
                   {v.plate && v.plate !== v.code ? ` — ${v.plate}` : ""}
                 </option>
@@ -99,9 +78,7 @@ export default async function ReportsPage({ searchParams }: Props) {
           </div>
 
           <div>
-            <label className="text-sm text-muted-foreground">
-              Proveedor
-            </label>
+            <label className="text-sm text-muted-foreground">Proveedor</label>
             <input
               name="provider"
               defaultValue={provider || ""}
@@ -109,7 +86,6 @@ export default async function ReportsPage({ searchParams }: Props) {
               placeholder="Ej: Taller Norte"
               className="app-input"
             />
-
             <datalist id="providers-list">
               {providers.map((p) => (
                 <option key={p.id} value={p.name} />
@@ -118,9 +94,7 @@ export default async function ReportsPage({ searchParams }: Props) {
           </div>
 
           <div>
-            <label className="text-sm text-muted-foreground">
-              Mes realizado
-            </label>
+            <label className="text-sm text-muted-foreground">Mes realizado</label>
             <input
               name="performedMonth"
               defaultValue={performedMonth || ""}
@@ -130,9 +104,7 @@ export default async function ReportsPage({ searchParams }: Props) {
           </div>
 
           <div>
-            <label className="text-sm text-muted-foreground">
-              Mes a vencer
-            </label>
+            <label className="text-sm text-muted-foreground">Mes a vencer</label>
             <input
               name="dueMonth"
               defaultValue={dueMonth || ""}
@@ -143,10 +115,7 @@ export default async function ReportsPage({ searchParams }: Props) {
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <Button type="submit">
-            Previsualizar
-          </Button>
-
+          <Button type="submit">Previsualizar</Button>
           <Button
             formAction="/api/reports/maintenances/excel"
             formMethod="GET"
@@ -154,7 +123,6 @@ export default async function ReportsPage({ searchParams }: Props) {
           >
             Exportar Excel
           </Button>
-
           <Button
             formAction="/api/reports/maintenances/pdf"
             formMethod="GET"
@@ -165,19 +133,11 @@ export default async function ReportsPage({ searchParams }: Props) {
         </div>
       </form>
 
-      <section className="grid md:grid-cols-3 gap-4">
+      <section className="grid md:grid-cols-2 gap-4">
         <div className="app-kpi">
           <p className="app-kpi-label">Registros encontrados</p>
           <p className="app-kpi-value">{maintenances.length}</p>
         </div>
-
-        <div className="app-kpi">
-          <p className="app-kpi-label">Costo total preview</p>
-          <p className="app-kpi-value">
-            ${totalCost.toLocaleString("es-AR")}
-          </p>
-        </div>
-
         <div className="app-kpi">
           <p className="app-kpi-label">Límite preview</p>
           <p className="app-kpi-value">25</p>
@@ -202,15 +162,16 @@ export default async function ReportsPage({ searchParams }: Props) {
                 <th className="p-3 text-left">Proveedor</th>
                 <th className="p-3 text-left">Realizado</th>
                 <th className="p-3 text-left">Vence</th>
-                <th className="p-3 text-left">Costo</th>
               </tr>
             </thead>
-
             <tbody>
               {maintenances.map((item) => (
                 <tr key={item.id} className="border-t">
-                  <td className="p-3">{item.title}</td>
-
+                  <td className="p-3 max-w-[220px]">
+                    <span className="block truncate" title={item.title}>
+                      {item.title}
+                    </span>
+                  </td>
                   <td className="p-3">
                     {item.vehicle.code}
                     {item.vehicle.plate &&
@@ -218,24 +179,14 @@ export default async function ReportsPage({ searchParams }: Props) {
                       ? ` — ${item.vehicle.plate}`
                       : ""}
                   </td>
-
                   <td className="p-3">
                     {item.provider?.name || "Sin proveedor"}
                   </td>
-
                   <td className="p-3">
                     {item.performedAt.toLocaleDateString("es-AR")}
                   </td>
-
                   <td className="p-3">
                     {item.nextDueDate?.toLocaleDateString("es-AR") || "-"}
-                  </td>
-
-                  <td className="p-3">
-                    $
-                    {item.cost
-                      ? Number(item.cost).toLocaleString("es-AR")
-                      : "-"}
                   </td>
                 </tr>
               ))}

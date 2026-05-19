@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { createVehicle } from "@/actions/vehicle-actions";
+import { updateVehicle } from "@/actions/vehicle-actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -10,15 +10,26 @@ function FieldError({ errors }: { errors?: string[] }) {
   return <p className="text-sm text-destructive mt-1">{errors[0]}</p>;
 }
 
-export default function NewVehiclePage() {
-  const [state, action, isPending] = useActionState(createVehicle, null);
+type Vehicle = {
+  id: string;
+  code: string;
+  type: string;
+  brand: string | null;
+  model: string | null;
+  plate: string | null;
+  engineHours: number;
+};
+
+export default function VehicleEditForm({ vehicle }: { vehicle: Vehicle }) {
+  const updateWithId = updateVehicle.bind(null, vehicle.id);
+  const [state, action, isPending] = useActionState(updateWithId, null);
 
   return (
     <main className="p-8 max-w-2xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Nuevo vehículo</h1>
+        <h1 className="text-2xl font-semibold">Editar vehículo</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Completá los datos del equipo o vehículo.
+          {vehicle.code} — {vehicle.type}
         </p>
       </div>
 
@@ -33,12 +44,12 @@ export default function NewVehiclePage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium">Código interno *</label>
-              <Input name="code" placeholder="VH-001" className="mt-1" />
+              <Input name="code" defaultValue={vehicle.code} className="mt-1" />
               <FieldError errors={state?.fieldErrors?.code} />
             </div>
             <div>
               <label className="text-sm font-medium">Tipo *</label>
-              <Input name="type" placeholder="Camioneta, Excavadora..." className="mt-1" />
+              <Input name="type" defaultValue={vehicle.type} className="mt-1" />
               <FieldError errors={state?.fieldErrors?.type} />
             </div>
           </div>
@@ -46,18 +57,18 @@ export default function NewVehiclePage() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium">Marca</label>
-              <Input name="brand" placeholder="Toyota" className="mt-1" />
+              <Input name="brand" defaultValue={vehicle.brand || ""} className="mt-1" />
             </div>
             <div>
               <label className="text-sm font-medium">Modelo</label>
-              <Input name="model" placeholder="Hilux 4x4" className="mt-1" />
+              <Input name="model" defaultValue={vehicle.model || ""} className="mt-1" />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium">Patente</label>
-              <Input name="plate" placeholder="ABC 123" className="mt-1" />
+              <Input name="plate" defaultValue={vehicle.plate || ""} className="mt-1" />
             </div>
             <div>
               <label className="text-sm font-medium">Horas de motor</label>
@@ -65,7 +76,7 @@ export default function NewVehiclePage() {
                 name="engineHours"
                 type="number"
                 min="0"
-                placeholder="0"
+                defaultValue={vehicle.engineHours}
                 className="mt-1"
               />
               <FieldError errors={state?.fieldErrors?.engineHours} />
@@ -73,7 +84,7 @@ export default function NewVehiclePage() {
           </div>
 
           <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? "Guardando..." : "Guardar vehículo"}
+            {isPending ? "Guardando..." : "Guardar cambios"}
           </Button>
         </form>
       </div>

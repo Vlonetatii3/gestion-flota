@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { createProvider } from "@/actions/provider-actions";
+import { updateProvider } from "@/actions/provider-actions";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
@@ -10,16 +10,24 @@ function FieldError({ errors }: { errors?: string[] }) {
   return <p className="text-sm text-destructive mt-1">{errors[0]}</p>;
 }
 
-export default function NewProviderPage() {
-  const [state, action, isPending] = useActionState(createProvider, null);
+type Provider = {
+  id: string;
+  name: string;
+  contactName: string | null;
+  email: string | null;
+  phone: string | null;
+  services: string | null;
+};
+
+export default function ProviderEditForm({ provider }: { provider: Provider }) {
+  const updateWithId = updateProvider.bind(null, provider.id);
+  const [state, action, isPending] = useActionState(updateWithId, null);
 
   return (
     <main className="p-8 max-w-xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Nuevo proveedor</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Registrá un taller o proveedor de servicios.
-        </p>
+        <h1 className="text-2xl font-semibold">Editar proveedor</h1>
+        <p className="text-sm text-muted-foreground mt-1">{provider.name}</p>
       </div>
 
       <div className="app-section space-y-4">
@@ -32,37 +40,45 @@ export default function NewProviderPage() {
         <form action={action} className="space-y-4">
           <div>
             <label className="text-sm font-medium">Nombre *</label>
-            <Input name="name" placeholder="Taller Norte" className="mt-1" />
+            <Input name="name" defaultValue={provider.name} className="mt-1" />
             <FieldError errors={state?.fieldErrors?.name} />
           </div>
           <div>
             <label className="text-sm font-medium">Contacto</label>
-            <Input name="contactName" placeholder="Juan Pérez" className="mt-1" />
+            <Input
+              name="contactName"
+              defaultValue={provider.contactName || ""}
+              className="mt-1"
+            />
           </div>
           <div>
             <label className="text-sm font-medium">Email</label>
             <Input
               name="email"
               type="email"
-              placeholder="contacto@taller.com"
+              defaultValue={provider.email || ""}
               className="mt-1"
             />
             <FieldError errors={state?.fieldErrors?.email} />
           </div>
           <div>
             <label className="text-sm font-medium">Teléfono</label>
-            <Input name="phone" placeholder="+54 11 1234-5678" className="mt-1" />
+            <Input
+              name="phone"
+              defaultValue={provider.phone || ""}
+              className="mt-1"
+            />
           </div>
           <div>
             <label className="text-sm font-medium">Servicios</label>
             <Input
               name="services"
-              placeholder="Mecánica, electricidad, gomería..."
+              defaultValue={provider.services || ""}
               className="mt-1"
             />
           </div>
           <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? "Guardando..." : "Guardar proveedor"}
+            {isPending ? "Guardando..." : "Guardar cambios"}
           </Button>
         </form>
       </div>
