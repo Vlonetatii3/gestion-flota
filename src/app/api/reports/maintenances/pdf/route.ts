@@ -48,10 +48,6 @@ export async function GET(request: Request) {
     orderBy: { performedAt: "desc" },
   });
 
-  const totalCost = items.reduce(
-    (acc, item) => acc + Number(item.cost || 0),
-    0
-  );
   const preventiveCount = items.filter((i) => i.category === "PREVENTIVE").length;
   const correctiveCount = items.filter((i) => i.category === "CORRECTIVE").length;
   const doneCount = items.filter((i) => i.isDone).length;
@@ -60,7 +56,7 @@ export async function GET(request: Request) {
   const pageW = doc.internal.pageSize.getWidth();
 
   // ── Header azul ──────────────────────────────────────────
-  doc.setFillColor(30, 64, 175); // azul oscuro
+  doc.setFillColor(30, 64, 175);
   doc.rect(0, 0, pageW, 38, "F");
 
   doc.setTextColor(255, 255, 255);
@@ -81,7 +77,6 @@ export async function GET(request: Request) {
     33
   );
 
-  // Filtros aplicados al lado derecho del header
   const filterParts: string[] = [];
   if (vehicle) filterParts.push(`Vehículo: ${vehicle}`);
   if (provider) filterParts.push(`Proveedor: ${provider}`);
@@ -133,7 +128,7 @@ export async function GET(request: Request) {
       `${item.vehicle.code}${item.vehicle.plate ? `\n${item.vehicle.plate}` : ""}${item.vehicle.brand || item.vehicle.model ? `\n${[item.vehicle.brand, item.vehicle.model].filter(Boolean).join(" ")}` : ""}`,
       item.title,
       CATEGORY_ES[item.category] ?? item.category,
-      item.isDone ? "✓ Realizado" : "Pendiente",
+      item.isDone ? "Realizado" : "Pendiente",
       item.provider?.name || "-",
       item.performedAt.toLocaleDateString("es-PY"),
       item.nextDueDate?.toLocaleDateString("es-PY") || "-",
@@ -161,17 +156,17 @@ export async function GET(request: Request) {
       6: { cellWidth: 28, halign: "center" },
       7: { cellWidth: 28, halign: "center" },
     },
-    didDrawCell: (data) => {
-      // Colorear la columna Estado
-      if (data.section === "body" && data.column.index === 4) {
-        const isDone = data.cell.text[0]?.includes("✓");
-        doc.setTextColor(isDone ? 22 : 185, isDone ? 163 : 28, isDone ? 74 : 18);
-      }
-    },
     willDrawCell: (data) => {
-      if (data.section === "body" && data.column.index === 3) {
-        const isCorrectivo = data.cell.text[0] === "Correctivo";
-        if (isCorrectivo) {
+      if (data.section !== "body") return;
+      if (data.column.index === 4) {
+        const isDone = data.cell.text[0] === "Realizado";
+        data.cell.styles.textColor = isDone
+          ? [22, 163, 74]
+          : [30, 30, 30];
+        data.cell.styles.fontStyle = isDone ? "bold" : "normal";
+      }
+      if (data.column.index === 3) {
+        if (data.cell.text[0] === "Correctivo") {
           data.cell.styles.textColor = [180, 60, 10];
         }
       }
