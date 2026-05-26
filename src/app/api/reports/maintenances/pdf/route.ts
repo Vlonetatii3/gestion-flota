@@ -62,7 +62,7 @@ export async function GET(request: Request) {
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(22);
   doc.setFont("helvetica", "bold");
-  doc.text("Reporte de Mantenimientos - Grupo Handling", 14, 18);
+  doc.text("Reporte de Mantenimientos - Ground Handling", 14, 18);
 
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
@@ -185,11 +185,6 @@ export async function GET(request: Request) {
       pageW / 2,
       doc.internal.pageSize.getHeight() - 8,
       { align: "center" }
-    );
-    doc.text(
-      "GRUPO HANDLING - DINAC",
-      14,
-      doc.internal.pageSize.getHeight() - 8
     );
   }
 
