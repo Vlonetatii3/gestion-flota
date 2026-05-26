@@ -29,6 +29,7 @@ type MaintenanceItem = {
   description: string | null;
   category: string;
   isDone: boolean;
+  doneAt: Date | null;
   performedAt: Date;
   nextDueDate: Date | null;
   cost: number | null;
@@ -58,9 +59,23 @@ export function MaintenanceCard({ item }: { item: MaintenanceItem }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const status = item.isDone
-    ? { label: "Realizado", className: "bg-green-100 text-green-700 border-green-200" }
-    : getMaintenanceStatus(item.nextDueDate);
+  const status = (() => {
+    if (!item.isDone) return getMaintenanceStatus(item.nextDueDate);
+    const lateDate =
+      item.nextDueDate &&
+      item.doneAt &&
+      item.doneAt > item.nextDueDate;
+    if (lateDate) {
+      return {
+        label: "Realizado fuera de plazo",
+        className: "bg-yellow-100 text-yellow-700 border-yellow-300",
+      };
+    }
+    return {
+      label: "Realizado",
+      className: "bg-green-100 text-green-700 border-green-200",
+    };
+  })();
 
   const category = CATEGORY_LABELS[item.category] ?? CATEGORY_LABELS.PREVENTIVE;
 
@@ -172,6 +187,14 @@ export function MaintenanceCard({ item }: { item: MaintenanceItem }) {
                 <p className="text-xs text-muted-foreground mt-1">Vence</p>
                 <p className="text-sm font-medium">
                   {item.nextDueDate.toLocaleDateString("es-PY")}
+                </p>
+              </>
+            )}
+            {item.isDone && item.doneAt && (
+              <>
+                <p className="text-xs text-muted-foreground mt-1">Marcado hecho</p>
+                <p className="text-sm font-medium">
+                  {item.doneAt.toLocaleDateString("es-PY")}
                 </p>
               </>
             )}

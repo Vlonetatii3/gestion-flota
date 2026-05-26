@@ -71,6 +71,7 @@ model Maintenance {
   nextDueEngineHours    Int?
 
   isDone                Boolean             @default(false)
+  doneAt                DateTime?
   category              MaintenanceCategory @default(PREVENTIVE)
 
   notifyDaysBefore      Int                 @default(15)

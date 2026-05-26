@@ -72,9 +72,17 @@ export async function deleteMaintenance(id: string) {
 }
 
 export async function markMaintenanceDone(id: string) {
+  const maintenance = await prisma.maintenance.findUnique({
+    where: { id },
+    select: { nextDueDate: true },
+  });
+
   await prisma.maintenance.update({
     where: { id },
-    data: { isDone: true },
+    data: {
+      isDone: true,
+      doneAt: new Date(),
+    },
   });
   revalidatePath("/maintenances");
   revalidatePath("/alerts");
@@ -83,12 +91,14 @@ export async function markMaintenanceDone(id: string) {
 export async function markMaintenancePending(id: string) {
   await prisma.maintenance.update({
     where: { id },
-    data: { isDone: false },
+    data: {
+      isDone: false,
+      doneAt: null,
+    },
   });
   revalidatePath("/maintenances");
   revalidatePath("/alerts");
 }
-
 export async function updateMaintenance(
   id: string,
   _prev: MaintenanceActionResult | null,
