@@ -60,6 +60,7 @@ const rows = maintenances.map((item) => ({
     FechaRealizada: item.performedAt.toLocaleDateString("es-PY"),
     ProximoVencimiento: item.nextDueDate?.toLocaleDateString("es-PY") || "",
     HorasMotor: item.currentEngineHours ?? "",
+    VencimientoHorasMotor: item.nextDueEngineHours ?? "",
   }));
 
   const worksheet = XLSX.utils.json_to_sheet(rows);

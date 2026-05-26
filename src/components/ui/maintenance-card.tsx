@@ -2,6 +2,7 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   markMaintenanceDone,
   markMaintenancePending,
@@ -20,7 +21,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Wrench, Calendar, Clock, Building2, Gauge } from "lucide-react";
+import { Wrench, Calendar, Building2, Gauge, Pencil } from "lucide-react";
 
 type MaintenanceItem = {
   id: string;
@@ -32,6 +33,7 @@ type MaintenanceItem = {
   nextDueDate: Date | null;
   cost: number | null;
   currentEngineHours: number | null;
+  nextDueEngineHours: number | null;
   vehicle: {
     code: string;
     plate: string | null;
@@ -90,7 +92,7 @@ export function MaintenanceCard({ item }: { item: MaintenanceItem }) {
         isPending ? "opacity-60" : ""
       } ${item.isDone ? "opacity-70" : ""}`}
     >
-      {/* Header de la card */}
+      {/* Header */}
       <div className="flex items-start justify-between gap-4 p-5 pb-3">
         <div className="flex items-start gap-3 min-w-0">
           <div className={`mt-0.5 rounded-lg p-2 shrink-0 ${
@@ -108,7 +110,6 @@ export function MaintenanceCard({ item }: { item: MaintenanceItem }) {
                 : "text-blue-600"
             }`} />
           </div>
-
           <div className="min-w-0">
             <h3 className={`font-semibold text-base leading-tight ${
               item.isDone ? "line-through text-muted-foreground" : ""
@@ -177,7 +178,7 @@ export function MaintenanceCard({ item }: { item: MaintenanceItem }) {
           </div>
         </div>
 
-        {/* Proveedor / Horas */}
+        {/* Proveedor */}
         <div className="flex items-start gap-2">
           <div className="rounded-md bg-muted p-1.5 shrink-0 mt-0.5">
             <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
@@ -202,11 +203,19 @@ export function MaintenanceCard({ item }: { item: MaintenanceItem }) {
                 ? `${item.currentEngineHours.toLocaleString("es-PY")} h`
                 : "—"}
             </p>
+            {item.nextDueEngineHours != null && (
+              <>
+                <p className="text-xs text-muted-foreground mt-1">Próx. venc. (horas)</p>
+                <p className="text-sm font-medium">
+                  {item.nextDueEngineHours.toLocaleString("es-PY")} h
+                </p>
+              </>
+            )}
             {item.cost != null && item.cost > 0 && (
               <>
                 <p className="text-xs text-muted-foreground mt-1">Costo</p>
                 <p className="text-sm font-medium">
-                  ${item.cost.toLocaleString("es-PY")}
+                  ₲{item.cost.toLocaleString("es-PY")}
                 </p>
               </>
             )}
@@ -216,6 +225,13 @@ export function MaintenanceCard({ item }: { item: MaintenanceItem }) {
 
       {/* Footer con acciones */}
       <div className="flex justify-end gap-2 px-5 py-3 border-t bg-muted/30 rounded-b-xl">
+        <Button asChild size="sm" variant="outline" disabled={isPending}>
+          <Link href={`/maintenances/${item.id}/edit`}>
+            <Pencil className="h-3.5 w-3.5 mr-1" />
+            Editar
+          </Link>
+        </Button>
+
         <Button
           size="sm"
           variant={item.isDone ? "outline" : "secondary"}

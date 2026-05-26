@@ -62,11 +62,11 @@ export async function GET(request: Request) {
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(22);
   doc.setFont("helvetica", "bold");
-  doc.text("Reporte de Mantenimientos", 14, 18);
+  doc.text("Reporte de Mantenimientos - Grupo Handling", 14, 18);
 
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
-  doc.text("Gestión de Flota", 14, 26);
+  doc.text("Dinac", 14, 26);
   doc.text(
     `Emitido: ${new Date().toLocaleDateString("es-PY", {
       day: "2-digit",
@@ -122,7 +122,7 @@ export async function GET(request: Request) {
   autoTable(doc, {
     startY: kpiY + 30,
     margin: { left: 14, right: 14 },
-    head: [["#", "Vehículo", "Servicio", "Tipo", "Estado", "Proveedor", "Fecha realizada", "Próx. vencimiento"]],
+    head: [["#", "Vehículo", "Servicio", "Tipo", "Estado", "Proveedor", "Fecha realizada", "Horas motor", "Próximo servicio (HS)"]],
     body: items.map((item, idx) => [
       String(idx + 1),
       `${item.vehicle.code}${item.vehicle.plate ? `\n${item.vehicle.plate}` : ""}${item.vehicle.brand || item.vehicle.model ? `\n${[item.vehicle.brand, item.vehicle.model].filter(Boolean).join(" ")}` : ""}`,
@@ -131,7 +131,8 @@ export async function GET(request: Request) {
       item.isDone ? "Realizado" : "Pendiente",
       item.provider?.name || "-",
       item.performedAt.toLocaleDateString("es-PY"),
-      item.nextDueDate?.toLocaleDateString("es-PY") || "-",
+      item.currentEngineHours ? String(item.currentEngineHours) : "-",
+      item.nextDueEngineHours ? String(item.nextDueEngineHours) : "-",
     ]),
     headStyles: {
       fillColor: [30, 64, 175],
@@ -186,7 +187,7 @@ export async function GET(request: Request) {
       { align: "center" }
     );
     doc.text(
-      "Gestión de Flota",
+      "GRUPO HANDLING - DINAC",
       14,
       doc.internal.pageSize.getHeight() - 8
     );

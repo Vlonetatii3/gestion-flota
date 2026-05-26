@@ -88,3 +88,46 @@ export async function markMaintenancePending(id: string) {
   revalidatePath("/maintenances");
   revalidatePath("/alerts");
 }
+
+export async function updateMaintenance(
+  id: string,
+  _prev: MaintenanceActionResult | null,
+  formData: FormData
+): Promise<MaintenanceActionResult> {
+  const raw = {
+    vehicleId: formData.get("vehicleId"),
+    providerId: formData.get("providerId") || undefined,
+    title: formData.get("title"),
+    description: formData.get("description") || undefined,
+    category: formData.get("category") || "PREVENTIVE",
+    performedAt: formData.get("performedAt"),
+    nextDueDate: formData.get("nextDueDate") || undefined,
+    cost: formData.get("cost") || undefined,
+    currentEngineHours: formData.get("currentEngineHours") || undefined,
+    nextDueEngineHours: formData.get("nextDueEngineHours") || undefined,
+  };
+
+  const parsed = MaintenanceSchema.safeParse(raw);
+  if (!parsed.success) {
+    return { fieldErrors: parsed.error.flatten().fieldErrors as Record<string, string[]> };
+  }
+
+  const { vehicleId, providerId, performedAt, nextDueDate, ...rest } = parsed.data;
+
+  try {
+    await prisma.maintenance.update({
+      where: { id },
+      data: {
+        vehicleId,
+        providerId: providerId || null,
+        performedAt: new Date(performedAt),
+        nextDueDate: nextDueDate ? new Date(nextDueDate) : null,
+        ...rest,
+      },
+    });
+  } catch {
+    return { error: "Error al actualizar el mantenimiento." };
+  }
+
+  redirect("/maintenances");
+}
